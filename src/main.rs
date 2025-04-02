@@ -1,16 +1,21 @@
-#[derive(Debug, PartialEq)]
+use std::fs;
+use std::io::{self, Write};
+use serde::{Serialize, Deserialize};
+
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
 enum TaskStatus {
     Pending,
     Completed,
 }
 
-#[derive(Debug, PartialOrd, Ord, Eq, PartialEq)]
+#[derive(Debug, PartialOrd, Ord, Eq, PartialEq, Serialize, Deserialize)]
 enum Priority {
     Low,
     Medium,
     High
 } 
 
+#[derive(Serialize, Deserialize)]
 struct Task {
     id: usize,
     description: String,
@@ -33,6 +38,7 @@ impl Task {
     }
 }
 
+#[derive(Serialize, Deserialize)]
 struct TodoList {
     tasks: Vec<Task>,
     next_id: usize,
@@ -40,6 +46,7 @@ struct TodoList {
 
 impl TodoList {
     fn new() -> Self {
+        println!("New list has been created");
         Self {
             tasks: Vec::new(),
             next_id: 1,
@@ -49,6 +56,7 @@ impl TodoList {
     fn add_task(&mut self, description: String, importance: Priority) {
         let task = Task::new(self.next_id, description, importance);
         self.tasks.push(task);
+        println!("Task {} has been added", self.next_id);
         self.next_id += 1;
     }
 
@@ -59,6 +67,10 @@ impl TodoList {
     }
 
     fn list_tasks(&self) {
+        if self.tasks.is_empty() {
+            println!("The list is empty!");
+            return;
+        }
         for task in &self.sorted_tasks() {
             println!(
                 "ID: {} | {} | Status: {:?} | Priority: {:?}",
@@ -109,34 +121,69 @@ impl TodoList {
             println!("Task could not be found");
         }
     }
+
+    fn save_to_file(&self, filename: &str) -> io::Result<()> {
+        let json = serde_json::to_string_pretty(&self).expect("Failed to serialize");
+
+        let mut file = fs::File::create(filename)?;
+        file.write_all(json.as_bytes())?;
+
+        println!("Saved file in: {}", filename);
+        Ok(())
+    }
+
+    fn load_from_file(filename: &str) -> io::Result<Self> {
+        let json = fs::read_to_string(filename)?;
+        let todo_list: TodoList = serde_json::from_str(&json).expect("Failed to deserialize");
+
+        Ok(todo_list)
+    }
 }
 
 fn main() {
+
+    println!("Example with loaded json file:");
+
+    let mut loaded_todo_list = TodoList::load_from_file("example.json").expect("Failed to load from file");
+
+    loaded_todo_list.list_tasks();
+
+    println!();
+
+    loaded_todo_list.add_task("Added into loaded Task".to_string(), Priority::High);
+    loaded_todo_list.edit_task(1, "This COMPLETED task has NOT been edited".to_string()); // Will not be edited
+    loaded_todo_list.edit_task(2, "This PENDING task has BEEN EDITED".to_string());
+
+    println!();
+
+    loaded_todo_list.list_tasks();
+
+    println!("\nExample with new list instance: ");
+
     let mut todo_list = TodoList::new();
 
-    todo_list.add_task("Learn Rust".to_string(), Priority::Medium);
-    todo_list.add_task("Build a todo list".to_string(), Priority::High);
+    todo_list.list_tasks(); // List empty list
 
-    todo_list.list_tasks();
+    todo_list.add_task("First task".to_string(), Priority::Low);
+    todo_list.add_task("This is another task".to_string(), Priority::Medium);
+    todo_list.add_task("This is the last task of this example but with the highest priority".to_string(), Priority::High);
 
     todo_list.complete_task(1);
-    todo_list.edit_task(2, "This task was updated".to_string());
-    todo_list.list_tasks();
 
-    todo_list.edit_task(1, "Trying to update completed task".to_string());
+    println!();
 
-    todo_list.add_task("3rd element todo".to_string(), Priority::Low);
-    todo_list.list_tasks();
-    todo_list.remove_task(2);
-    todo_list.list_tasks();
-    todo_list.add_task("High priority task".to_string(), Priority::High);
-    todo_list.list_tasks();
-
-    todo_list.complete_task(3);
+    println!("\nListing only the completed tasks");
     todo_list.list_completed_tasks();
 
+    println!();
+
+    todo_list.list_tasks();
+    todo_list.remove_task(2);
+
+    println!("\nList after removing task 2");
+
+    todo_list.list_tasks();
+
+    let _ = todo_list.save_to_file("saved_todo_list.json");
 }
-
-
-
 

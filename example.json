@@ -1,0 +1,23 @@
+{
+  "tasks": [
+    {
+      "id": 1,
+      "description": "This is a json file",
+      "importance": "Medium",
+      "status": "Completed"
+    },
+    {
+      "id": 2,
+      "description": "This file will be loaded into the todo application",
+      "importance": "High",
+      "status": "Pending"
+    },
+    {
+      "id": 3,
+      "description": "Task 1 is completed",
+      "importance": "Low",
+      "status": "Pending"
+    }
+  ],
+  "next_id": 4
+}
