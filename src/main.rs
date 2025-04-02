@@ -1,4 +1,4 @@
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 enum TaskStatus {
     Pending,
     Completed,
@@ -60,6 +60,19 @@ impl TodoList {
             println!("Task could not be found");
         }
     }
+
+    fn edit_task(&mut self, task_id: usize, description: String) {
+        if let Some(task) = self.tasks.iter_mut().find(|t| t.id == task_id) {
+            if task.status == TaskStatus::Completed {
+                println!("Task {} is already completed, it can not be edited", task_id)
+            } else {
+                task.description = description;
+                println!("Task {} has been edited successfully!", task_id)
+            }
+        } else {
+            println!("Task could not be found");
+        }
+    }
 }
 
 fn main() {
@@ -71,7 +84,10 @@ fn main() {
     todo_list.list_tasks();
 
     todo_list.complete_task(1);
+    todo_list.edit_task(2, "This task was updated".to_string());
     todo_list.list_tasks();
+
+    todo_list.edit_task(1, "Trying to update completed task".to_string());
 
 }
 
