@@ -1,17 +1,16 @@
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq)]
 enum TaskStatus {
     Pending,
     Completed,
 }
 
-#[derive(Debug, Clone, PartialOrd, Ord, Eq, PartialEq)]
+#[derive(Debug, PartialOrd, Ord, Eq, PartialEq)]
 enum Priority {
     Low,
     Medium,
     High
 } 
 
-#[derive(Clone)]
 struct Task {
     id: usize,
     description: String,
