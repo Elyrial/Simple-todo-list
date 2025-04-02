@@ -67,6 +67,18 @@ impl TodoList {
         }
     }
 
+    // Instead of seperate functions, create a generic filtering system
+    fn list_completed_tasks(&self) {
+        for task in &self.tasks {
+            if task.status == TaskStatus::Completed {
+                println!(
+                    "ID: {} | {} | Status: {:?} | Priority: {:?}",
+                    task.id, task.description, task.status, task.importance
+                );
+            }
+        }
+    }
+
     fn complete_task(&mut self, task_id: usize)  {
         if let Some(task) = self.tasks.iter_mut().find(|t| t.id == task_id) {
             task.complete();
@@ -119,6 +131,9 @@ fn main() {
     todo_list.list_tasks();
     todo_list.add_task("High priority task".to_string(), Priority::High);
     todo_list.list_tasks();
+
+    todo_list.complete_task(3);
+    todo_list.list_completed_tasks();
 
 }
 
