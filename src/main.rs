@@ -1,16 +1,17 @@
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 enum TaskStatus {
     Pending,
     Completed,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialOrd, Ord, Eq, PartialEq)]
 enum Priority {
     Low,
     Medium,
     High
 } 
 
+#[derive(Clone)]
 struct Task {
     id: usize,
     description: String,
@@ -52,8 +53,14 @@ impl TodoList {
         self.next_id += 1;
     }
 
+    fn sorted_tasks(&self) -> Vec<&Task> {
+        let mut sorted: Vec<&Task> = self.tasks.iter().collect();
+        sorted.sort_by(|a, b| b.importance.cmp(&a.importance));
+        sorted
+    }
+
     fn list_tasks(&self) {
-        for task in &self.tasks {
+        for task in &self.sorted_tasks() {
             println!(
                 "ID: {} | {} | Status: {:?} | Priority: {:?}",
                 task.id, task.description, task.status, task.importance
@@ -110,6 +117,8 @@ fn main() {
     todo_list.add_task("3rd element todo".to_string(), Priority::Low);
     todo_list.list_tasks();
     todo_list.remove_task(2);
+    todo_list.list_tasks();
+    todo_list.add_task("High priority task".to_string(), Priority::High);
     todo_list.list_tasks();
 
 }
