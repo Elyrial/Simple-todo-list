@@ -4,17 +4,26 @@ enum TaskStatus {
     Completed,
 }
 
+#[derive(Debug)]
+enum Priority {
+    Low,
+    Medium,
+    High
+} 
+
 struct Task {
     id: usize,
     description: String,
+    importance: Priority,
     status: TaskStatus,
 }
 
 impl Task {
-    fn new(id: usize, description: String) -> Self {
+    fn new(id: usize, description: String, importance: Priority) -> Self {
         Self {
             id,
             description,
+            importance,
             status: TaskStatus::Pending,
         }
     }
@@ -37,8 +46,8 @@ impl TodoList {
         }
     }
 
-    fn add_task(&mut self, description: String) {
-        let task = Task::new(self.next_id, description);
+    fn add_task(&mut self, description: String, importance: Priority) {
+        let task = Task::new(self.next_id, description, importance);
         self.tasks.push(task);
         self.next_id += 1;
     }
@@ -46,8 +55,8 @@ impl TodoList {
     fn list_tasks(&self) {
         for task in &self.tasks {
             println!(
-                "ID: {} | {} | Status: {:?}",
-                task.id, task.description, task.status
+                "ID: {} | {} | Status: {:?} | Priority: {:?}",
+                task.id, task.description, task.status, task.importance
             );
         }
     }
@@ -87,8 +96,8 @@ impl TodoList {
 fn main() {
     let mut todo_list = TodoList::new();
 
-    todo_list.add_task("Learn Rust".to_string());
-    todo_list.add_task("Build a todo list".to_string());
+    todo_list.add_task("Learn Rust".to_string(), Priority::Medium);
+    todo_list.add_task("Build a todo list".to_string(), Priority::High);
 
     todo_list.list_tasks();
 
@@ -98,7 +107,7 @@ fn main() {
 
     todo_list.edit_task(1, "Trying to update completed task".to_string());
 
-    todo_list.add_task("3rd element todo".to_string());
+    todo_list.add_task("3rd element todo".to_string(), Priority::Low);
     todo_list.list_tasks();
     todo_list.remove_task(2);
     todo_list.list_tasks();
