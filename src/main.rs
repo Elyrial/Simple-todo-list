@@ -73,6 +73,15 @@ impl TodoList {
             println!("Task could not be found");
         }
     }
+
+    fn remove_task(&mut self, task_id: usize) {
+        if let Some(pos) = self.tasks.iter_mut().position(|t| t.id == task_id) {
+            self.tasks.remove(pos);
+            println!("Task {} has been successfully removed", task_id);
+        } else {
+            println!("Task could not be found");
+        }
+    }
 }
 
 fn main() {
@@ -88,6 +97,11 @@ fn main() {
     todo_list.list_tasks();
 
     todo_list.edit_task(1, "Trying to update completed task".to_string());
+
+    todo_list.add_task("3rd element todo".to_string());
+    todo_list.list_tasks();
+    todo_list.remove_task(2);
+    todo_list.list_tasks();
 
 }
 
